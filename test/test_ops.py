@@ -1975,23 +1975,26 @@ class TestOps(unittest.TestCase):
     torch_nll_loss = torch.nn.functional.nll_loss
     torch_log_softmax = torch.nn.functional.log_softmax
 
-    # helper_test_op([(15), (15)], lambda x,y: torch.nn.functional.nll_loss(x,y),
+    helper_test_op([(32), (32)], lambda x,y: torch.nn.functional.nll_loss(x,torch.clip(y,0,1)),
+                                       lambda x,y: x.nll_loss(y.clip(0,1)))
+
+    # helper_test_op([(15), (15)], lambda x,y: torch.nn.functional.nll_loss(x.sigmoid(),y),
     #                              lambda x,y: x.nll_loss(y))
-    helper_test_op(None,
-                   lambda data, target: torch_nll_loss(torch_log_softmax(data, dim = 1), target),
-                   lambda data, target: Tensor(data.nll_loss(target).numpy()),
-                   forward_only=True, vals = [np.random.randn(3, 5), np.array([1, 0, 4])])
+    # helper_test_op(None,
+    #                lambda data, target: torch_nll_loss(torch_log_softmax(data, dim = 1), target),
+    #                lambda data, target: Tensor(data.nll_loss(target).numpy()),
+    #                forward_only=True, vals = [np.random.randn(3, 5), np.array([1, 0, 4])])
 
   def test_cross_entropy(self):
     torch_cross_entropy = torch.nn.functional.cross_entropy
 
-    # helper_test_op([(32,10), (32,10)], lambda x,y: torch.nn.functional.cross_entropy(x.sigmoid(),torch.clip(y,0,1)),
-    #                                    lambda x,y: x.sigmoid().cross_entropy(y.clip(0,1)))
+    helper_test_op([(32,10), (32,10)], lambda x,y: torch.nn.functional.cross_entropy(x.sigmoid(),torch.clip(y,0,1)),
+                                       lambda x,y: x.sigmoid().cross_entropy(y.clip(0,1)))
 
-    helper_test_op(None,
-                   lambda data, target: torch_cross_entropy(data, target),
-                   lambda data, target: Tensor(data.cross_entropy(target).numpy()),
-                   forward_only=True, vals = [np.random.randn(3, 5), [1, 0, 4]])
+    # helper_test_op(None,
+    #                lambda data, target: torch_cross_entropy(data, target),
+    #                lambda data, target: Tensor(data.cross_entropy(target).numpy()),
+    #                forward_only=True, vals = [np.random.randn(3, 5), [1, 0, 4]])
 
   def test_masked_fill(self):
     helper_test_op([(32,10)], lambda x: x.masked_fill((x>0.1).detach(), -math.inf))
