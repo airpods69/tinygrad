@@ -2860,11 +2860,10 @@ class Tensor:
     """
     Returns the nll_loss for self with target.
     """
-    return -1*(self.gather(1, target.view(1, target.shape[0]).T)).mean()
+    return -self.gather(1, target.view(1, target.shape[0]).T).mean()
 
   def cross_entropy(self, target:Tensor) -> Tensor:
-    ## TODO
-    return self.log_softmax().nll_loss(target)
+    return self.log_softmax().nll_loss(target).mean()
 
   def scaled_dot_product_attention(self, key:Tensor, value:Tensor, attn_mask:Optional[Tensor]=None,
                                    dropout_p:float=0.0, is_causal:bool=False) -> Tensor:
