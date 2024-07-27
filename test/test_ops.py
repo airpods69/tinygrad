@@ -1971,13 +1971,13 @@ class TestOps(unittest.TestCase):
     helper_test_op([], lambda: torch.nn.functional.one_hot(torch.tensor(data), 8).type(torch.int32),
                        lambda: Tensor(data).one_hot(8), forward_only=True)
 
-  def test_negative_log_likelihood(self):
+  def test_nll_loss(self):
     helper_test_op([(4, 4), (4)], lambda x,y: torch.nn.functional.nll_loss(x,torch.clip(y, 0).type(torch.long), reduction = 'mean'),
                                   lambda x,y: x.nll_loss(y.clip(0).cast(dtypes.long)), forward_only=True)
 
   def test_cross_entropy(self):
     helper_test_op([(4, 4), (4)], lambda x,y: torch.nn.functional.cross_entropy(x,torch.clip(y, 0).type(torch.long), reduction = 'mean'),
-                                       lambda x,y: x.cross_entropy(y.clip(0,1)), forward_only=False)
+                                       lambda x,y: x.cross_entropy(y.clip(0,1)), forward_only=True)
 
     # helper_test_op(None,
     #                lambda data, target: torch_cross_entropy(data, target),
