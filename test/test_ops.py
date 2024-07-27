@@ -1979,11 +1979,6 @@ class TestOps(unittest.TestCase):
     helper_test_op([(4, 4), (4)], lambda x,y: torch.nn.functional.cross_entropy(x,torch.clip(y, 0).type(torch.long), reduction = 'mean'),
                                        lambda x,y: x.cross_entropy(y.clip(0,1)), forward_only=True)
 
-    # helper_test_op(None,
-    #                lambda data, target: torch_cross_entropy(data, target),
-    #                lambda data, target: Tensor(data.cross_entropy(target).numpy()),
-    #                forward_only=True, vals = [np.random.randn(3, 5), [1, 0, 4]])
-
   def test_masked_fill(self):
     helper_test_op([(32,10)], lambda x: x.masked_fill((x>0.1).detach(), -math.inf))
     helper_test_op([(32,10)], lambda x: x.masked_fill((x<0.1).detach(), -math.inf))
