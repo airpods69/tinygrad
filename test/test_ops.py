@@ -27,7 +27,6 @@ def helper_test_op(shps, torch_fxn, tinygrad_fxn=None, atol=1e-6, rtol=1e-3, gra
 
   st = time.monotonic()
   ret = tinygrad_fxn(*tst).realize()
-  print("tinygrad: ", ret.shape)
   tinygrad_fp = time.monotonic() - st
 
   def compare(s, tinygrad_output, torch_output, atol, rtol):
@@ -1978,7 +1977,7 @@ class TestOps(unittest.TestCase):
 
   def test_cross_entropy(self):
     helper_test_op([(4, 4), (4)], lambda x,y: torch.nn.functional.cross_entropy(x,torch.clip(y, 0).type(torch.long), reduction = 'mean'),
-                                       lambda x,y: x.cross_entropy(y.clip(0,1)), forward_only=True)
+                                       lambda x,y: x.cross_entropy(y.clip(0,1)), forward_only=False)
 
     # helper_test_op(None,
     #                lambda data, target: torch_cross_entropy(data, target),
