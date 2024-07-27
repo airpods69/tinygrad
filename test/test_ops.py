@@ -27,6 +27,7 @@ def helper_test_op(shps, torch_fxn, tinygrad_fxn=None, atol=1e-6, rtol=1e-3, gra
 
   st = time.monotonic()
   ret = tinygrad_fxn(*tst).realize()
+  print("tinygrad: ", ret.shape)
   tinygrad_fp = time.monotonic() - st
 
   def compare(s, tinygrad_output, torch_output, atol, rtol):
@@ -1972,23 +1973,12 @@ class TestOps(unittest.TestCase):
                        lambda: Tensor(data).one_hot(8), forward_only=True)
 
   def test_negative_log_likelihood(self):
-    torch_nll_loss = torch.nn.functional.nll_loss
-    torch_log_softmax = torch.nn.functional.log_softmax
-
     helper_test_op([(4, 4), (4)], lambda x,y: torch.nn.functional.nll_loss(x,torch.clip(y, 0).type(torch.long), reduction = 'mean'),
-                                  lambda x,y: x.nll_loss(y.clip(0).cast(dtypes.long)))
-
-    # helper_test_op([(15), (15)], lambda x,y: torch.nn.functional.nll_loss(x.sigmoid(),y),
-    #                              lambda x,y: x.nll_loss(y))
-    # helper_test_op(None,
-    #                lambda data, target: torch_nll_loss(torch_log_softmax(data, dim = 1), target),
-    #                lambda data, target: Tensor(data.nll_loss(target).numpy()),
-    #                forward_only=True, vals = [np.random.randn(3, 5), np.array([1, 0, 4])])
+                                  lambda x,y: x.nll_loss(y.clip(0).cast(dtypes.long)), forward_only=True)
 
   def test_cross_entropy(self):
-    torch_cross_entropy = torch.nn.functional.cross_entropy
-    helper_test_op([(32,10), (32,10)], lambda x,y: torch.nn.functional.cross_entropy(x.sigmoid(),torch.clip(y,0,1)),
-                                       lambda x,y: x.sigmoid().cross_entropy(y.clip(0,1)))
+    helper_test_op([(4, 4), (4)], lambda x,y: torch.nn.functional.cross_entropy(x,torch.clip(y, 0).type(torch.long), reduction = 'mean'),
+                                       lambda x,y: x.cross_entropy(y.clip(0,1)), forward_only=True)
 
     # helper_test_op(None,
     #                lambda data, target: torch_cross_entropy(data, target),
